@@ -287,7 +287,7 @@ function carregarProdutosParaVoce() {
   const area = document.getElementById("produtosParaVoce");
   if (!area) return;
 
-  const vistos = JSON.parse(localStorage.getItem("produtosVistos")) || [];
+  const vistos = JSON.parse(localStorage.getItem("qa_produtos_vistos")) || [];
   const secao = area.closest(".produtos-para-voce");
 
   if (!vistos.length) {
@@ -297,30 +297,34 @@ function carregarProdutosParaVoce() {
 
   if (secao) secao.style.display = "block";
 
-  const categorias = vistos.map(v => v.categoria);
+  area.innerHTML = vistos.slice(0, 7).map(produto => {
+    const link = produto.url || `produto.html?id=${produto.id}`;
 
-  const recomendados = produtos
-    .filter(p => categorias.includes(p.categoria))
-    .filter(p => !vistos.some(v => Number(v.id) === Number(p.id)))
-    .slice(0, 12);
+    const imagem =
+      produto.imagem ||
+      produto.image ||
+      produto.images?.[0] ||
+      "img/placeholder.jpg";
 
-  area.innerHTML = recomendados.map(p => {
-    const link = `produto.html?id=${p.id}`;
+    const preco = Number(produto.preco || 0).toFixed(2);
 
     return `
       <div class="produto-card">
         <a href="${link}">
-          <img src="${p.images[0]}" alt="${p.nome}">
+          <img src="${imagem}" alt="${produto.nome}">
         </a>
-        <h3>${p.nome}</h3>
-        <p class="preco">U$ ${p.preco.toFixed(2)}</p>
+
+        <h3>${produto.nome}</h3>
+
+        <p class="preco">U$ ${preco}</p>
+
         <a href="${link}" class="btn-ver">Ver produto</a>
       </div>
     `;
   }).join("");
 
- const prev = document.querySelector(".pfv-car-left");
- const next = document.querySelector(".pfv-car-right");
+  const prev = document.querySelector(".pfv-car-left");
+  const next = document.querySelector(".pfv-car-right");
 
   function atualizarSetas() {
     if (!prev || !next) return;
